@@ -339,6 +339,13 @@ public class Jenkins extends AbstractCIBase implements DirectlyModifiableTopLeve
      */
     private Mode mode = Mode.NORMAL;
 
+    //Q3 changes
+    public void updateAndTrim(){
+        updateComputerList(); 
+	trimLabels();
+    }
+
+
     /**
      * False to enable anyone to do anything.
      * Left as a field so that we can still read old data that uses this flag.
