@@ -150,12 +150,12 @@ public class Connection {
         PublicKey otherHalf;
 
         if (side) {
-            AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
-            paramGen.init(keySize);
+           // AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
+           // paramGen.init(keySize);
 
-            KeyPairGenerator dh = KeyPairGenerator.getInstance("DH");
-            dh.initialize(paramGen.generateParameters().getParameterSpec(DHParameterSpec.class));
-            keyPair = dh.generateKeyPair();
+           // KeyPairGenerator dh = KeyPairGenerator.getInstance("DH");
+           // dh.initialize(paramGen.generateParameters().getParameterSpec(DHParameterSpec.class));
+            keyPair = generateKeyPairWithSpec(side, keySize);
 
             // send a half and get a half
             writeKey(keyPair.getPublic());
@@ -163,9 +163,9 @@ public class Connection {
         } else {
             otherHalf = KeyFactory.getInstance("DH").generatePublic(readKey());
 
-            KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DH");
-            keyPairGen.initialize(((DHPublicKey) otherHalf).getParams());
-            keyPair = keyPairGen.generateKeyPair();
+            //KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DH");
+            //keyPairGen.initialize(((DHPublicKey) otherHalf).getParams());
+            keyPair = generateKeyPairWithSpec(side, keySize);
 
             // send a half and get a half
             writeKey(keyPair.getPublic());
@@ -177,6 +177,44 @@ public class Connection {
 
         return ka;
     }
+
+   public KeyPair generateKeyPairWithSpec(boolean DHParameterSpec, int keySize) throws IOException, GeneralSecurityException{
+       KeyPair keyPair;
+       PublicKey otherHalf;
+
+       if(DHParameterSpec){
+	   AlgorithmParameterGenerator paramGen = AlgorithmParameterGenerator.getInstance("DH");
+           paramGen.init(keySize);
+
+	   KeyPairGenerator dh = KeyPairGenerator.getInstance("DH");
+           dh.initialize(paramGen.generateParameters().getParameterSpec(DHParameterSpec.class));
+           keyPair = dh.generateKeyPair();
+
+
+       } else {
+
+	   otherHalf = KeyFactory.getInstance("DH").generatePublic(readKey());
+
+           KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("DH");
+           keyPairGen.initialize(((DHPublicKey) otherHalf).getParams());
+           keyPair = keyPairGen.generateKeyPair();
+
+       }
+
+
+     return keyPair;
+
+   }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Upgrades a connection with transport encryption by the specified symmetric cipher.
