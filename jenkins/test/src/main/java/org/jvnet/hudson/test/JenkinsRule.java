@@ -1193,24 +1193,25 @@ public class JenkinsRule implements TestRule, MethodRule, RootAction {
         List<? extends Object> nodes = page.getByXPath(xpath);
         assertThat("There should be an object that matches XPath:" + xpath, nodes.isEmpty(), is(false));
     }
+ 
 
-    public void assertXPathValue(DomNode page, String xpath, String expectedValue) {
-        Object node = page.getFirstByXPath(xpath);
+    public String removedup(DomNode page, String xpath, String value){
+	Object node = page.getFirstByXPath(xpath);
         assertNotNull("no node found", node);
         assertTrue("the found object was not a Node " + xpath, node instanceof org.w3c.dom.Node);
 
         org.w3c.dom.Node n = (org.w3c.dom.Node) node;
         String textString = n.getTextContent();
+	return textString;
+
+	}
+    public void assertXPathValue(DomNode page, String xpath, String expectedValue) {
+        String textString = removedup(page, xpath, expectedValue);
         assertEquals("xpath value should match for " + xpath, expectedValue, textString);
     }
 
     public void assertXPathValueContains(DomNode page, String xpath, String needle) {
-        Object node = page.getFirstByXPath(xpath);
-        assertNotNull("no node found", node);
-        assertTrue("the found object was not a Node " + xpath, node instanceof org.w3c.dom.Node);
-
-        org.w3c.dom.Node n = (org.w3c.dom.Node) node;
-        String textString = n.getTextContent();
+        String textString = removedup(page, xpath, needle);
         assertTrue("needle found in haystack", textString.contains(needle));
     }
 
